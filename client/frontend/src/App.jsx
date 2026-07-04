@@ -1,122 +1,111 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import './App.css';
+
+// IMPORTING YOUR MODULAR PAGES
+import { EmployeeDashboard, AdminDashboard } from './pages/Dashboard';
+import ProfilePage from './pages/Profile';
+import AttendancePage from './pages/Attendance';
+import LeavePage from './pages/Leave';
+import AuthPage from './pages/Auth'; // Imported your new authentication page!
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Authentication States
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState('employee'); // 'employee' or 'admin'
+  
+  // Navigation State
+  const [currentPage, setCurrentPage] = useState('dashboard'); 
+  
+  // Attendance State
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+
+  // Function called when Login/Register is successful
+  const handleLoginSuccess = (userRole) => {
+    setRole(userRole);
+    setIsLoggedIn(true);
+    setCurrentPage('dashboard');
+  };
+
+  // Function to handle Logout
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setIsCheckedIn(false);
+  };
+
+  // GATEKEEPING: If not logged in, show the Auth Page exclusively
+  if (!isLoggedIn) {
+    return <AuthPage onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <div className="app-container" style={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif', backgroundColor: '#f4f6f9' }}>
+      
+      {/* SIDEBAR NAVIGATION */}
+      <div className="sidebar" style={{ width: '250px', backgroundColor: '#1e293b', color: 'white', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+          <h2 style={{ fontSize: '20px', marginBottom: '30px', borderBottom: '1px solid #334155', paddingBottom: '10px' }}>HRMS Portal</h2>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <button onClick={() => setCurrentPage('dashboard')} style={navButtonStyle(currentPage === 'dashboard')}>Dashboard</button>
+            <button onClick={() => setCurrentPage('profile')} style={navButtonStyle(currentPage === 'profile')}>My Profile</button>
+            <button onClick={() => setCurrentPage('attendance')} style={navButtonStyle(currentPage === 'attendance')}>Attendance</button>
+            <button onClick={() => setCurrentPage('leave')} style={navButtonStyle(currentPage === 'leave')}>Leave & Time-Off</button>
+          </nav>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        {/* LOGOUT BUTTON */}
+        <div>
+          <button 
+            onClick={handleLogout} 
+            style={{ width: '100%', padding: '12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', marginBottom: '15px' }}
+          >
+            Logout
+          </button>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          {/* QUICK ROLE SWAPPER FOR HACKATHON JUDGES */}
+          <div style={{ backgroundColor: '#334155', padding: '10px', borderRadius: '6px', textAlign: 'center' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#94a3b8' }}>Testing Role Switcher:</p>
+            <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: '100%', padding: '5px', borderRadius: '4px', cursor: 'pointer' }}>
+              <option value="employee">View as Employee</option>
+              <option value="admin">View as Admin / HR</option>
+            </select>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* MAIN CONTENT AREA */}
+      <div className="main-content" style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <h1 style={{ margin: 0, textTransform: 'capitalize' }}>{currentPage}</h1>
+          <div style={{ fontWeight: 'bold', color: '#475569' }}>
+            Logged in as: <span style={{ color: '#2563eb', textTransform: 'uppercase' }}>{role}</span>
+          </div>
+        </header>
+
+        {/* DYNAMIC ROUTING MAP */}
+        {currentPage === 'dashboard' && (
+          role === 'employee' ? <EmployeeDashboard /> : <AdminDashboard />
+        )}
+        {currentPage === 'profile' && <ProfilePage role={role} />}
+        {currentPage === 'attendance' && <AttendancePage role={role} isCheckedIn={isCheckedIn} setIsCheckedIn={setIsCheckedIn} />}
+        {currentPage === 'leave' && <LeavePage role={role} />}
+      </div>
+    </div>
+  );
 }
 
-export default App
+function navButtonStyle(isActive) {
+  return {
+    padding: '12px 15px',
+    textAlign: 'left',
+    backgroundColor: isActive ? '#2563eb' : 'transparent',
+    color: isActive ? 'white' : '#cbd5e1',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '15px',
+    fontWeight: isActive ? 'bold' : 'normal',
+    transition: '0.2s'
+  };
+}
+
+export default App;
